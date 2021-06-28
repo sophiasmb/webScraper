@@ -6,10 +6,10 @@ Creator: Sophia M. Barnett
 Revision History:
     06/25/2021: Creation 
     06/26/2021: Stores basic data in json object from nbc us news articles
+    06/28/2021: Checks inside articles for keywords
 """
 # Things to accomplish
 # 1. Add page scrolling so more articles can be searched (include selenium?)
-# 2. Go into each article and search the whole page for key words
 # 3. Set up website to show the title and subscript of the articles
 # 4. Search multiple different national news websites
 
@@ -26,6 +26,7 @@ def scan_article(url):
     res = requests.get(url, timeout=5)
     content = BeautifulSoup(res.content, "html.parser")
 
+    # Attempt to search article. return false if article is formatted differently
     try:
         for paragraph in content.find("div", attrs={"class": "article-body__content"}):
             if any(x in paragraph.text for x in matches):
@@ -80,13 +81,11 @@ def main():
         }
         articles.append(articleObject)
 
+        # Checks for words in list 
         if any(x in (articleObject["title"] or articleObject["subscript"]) for x in matches):
             print(articleObject["title"])
         elif scan_article(articleObject['link']):
             print(articleObject["title"])
-
-    #if scan_article(articles[5]['link']):
-    #    print(articles[5]["title"])
 
     # store data as a json file
     with open("articleData.json", "w") as outfile:
